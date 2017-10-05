@@ -39,7 +39,7 @@ module.exports = {
                 if (req.body.newPassword.length < 6) {
                     return res.status(400).send();    
                 }
-                
+
                 body.password = bcrypt.hashSync(req.body.newPassword , 10);
             }
 
@@ -67,7 +67,6 @@ module.exports = {
         Driver.findByCredentials(body.email , body.password)
             .then(driver => {
             driver.generateAuthToken().then(token => {
-                //req.driver.updateDriving();
                 res.header('x-auth' , token).send(driver);
             });
         }).catch(e => {
@@ -78,7 +77,6 @@ module.exports = {
     logout(req , res) {
         req.driver.removeToken(req.token)
             .then(() => {
-            //req.driver.updateDriving();
             res.send();
         }).catch((e) => {
             res.status(400).send();

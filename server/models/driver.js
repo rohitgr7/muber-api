@@ -5,6 +5,18 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const _ = require('lodash');
 
+const pointSchema = new Schema({
+    type: {
+        type: String,
+        default: 'Point'
+    },
+    
+    coordiantes: {
+        type: [Number],
+        index: '2dsphere'
+    }
+});
+
 const driverSchema = new Schema({
     name: {
         type: String,
@@ -34,6 +46,8 @@ const driverSchema = new Schema({
         type: Boolean,
         default: false
     },
+    
+    geometry: pointSchema,
 
     tokens: [{
         access: {
@@ -58,6 +72,7 @@ driverSchema.methods.generateAuthToken = function() {
     const access = 'auth';
     const token = jwt.sign({_id: driver._id.toHexString() , access} , "abc123").toString();
     
+    driver.driving = true;
     driver.tokens.push({
         access,
         token
@@ -81,22 +96,14 @@ driverSchema.methods.verifyPassword = function(password) {
     });
 };
 
-driverSchema.methods.updateDriving = function() {
-    const driver = this;
-
-    if(driver.tokens.length > 0) {
-        driver.driving = true;
-    }
-    else if (driver.tokens.length === 0) {
-        driver.driving = false;
-    }
-
-    return driver.save();
-}
-
 driverSchema.methods.removeToken = function(token) {
     const driver = this;
-
+    
+    if (driver.tokens.length === 1) {
+        driver.driving = false;
+        driver.save();
+    }
+    
     return driver.update({
         $pull: {
             tokens: {token}

@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const routes = require('./routes/routes');
 
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost:27017/mubernew' , {
+mongoose.connect('mongodb://localhost:27017/muber' , {
     useMongoClient: true
 });
 
