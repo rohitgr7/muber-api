@@ -7,7 +7,6 @@ const pointSchema = new Schema({
     },
 
     coordinates: {
-        required: true,
         type: [Number],
         index: '2dsphere'
     }

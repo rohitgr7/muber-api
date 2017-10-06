@@ -100,5 +100,23 @@ module.exports = {
         }).catch(e => {
             res.status(400).send();
         });
+    },
+
+    updateLocation(req , res) {
+        const address = req.params.location;
+        const encodedAddress = encodeURIComponent(address);
+
+        func.getLocation(encodedAddress).then(location => {
+            return req.driver.update( {$set: {
+                geometry: {
+                    type: 'Point',
+                    coordinates: [ parseFloat(location.longitude) , parseFloat(location.latitude) ]
+                }
+            } } ).then(driver => {
+                res.send();
+            });
+        }).catch(e => {
+            res.status(400).send(); 
+        });
     }
 };
