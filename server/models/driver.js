@@ -4,18 +4,7 @@ const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const _ = require('lodash');
-
-const pointSchema = new Schema({
-    type: {
-        type: String,
-        default: 'Point'
-    },
-    
-    coordiantes: {
-        type: [Number],
-        index: '2dsphere'
-    }
-});
+const {pointSchema} = require('./pointSchema');
 
 const driverSchema = new Schema({
     name: {
@@ -46,7 +35,7 @@ const driverSchema = new Schema({
         type: Boolean,
         default: false
     },
-    
+
     geometry: pointSchema,
 
     tokens: [{
@@ -64,20 +53,20 @@ driverSchema.methods.toJSON = function() {
     const driver = this;
     const driverObj = driver.toObject();
 
-    return _.pick(driver , ['name' , 'email' , '_id']);
+    return _.pick(driver , ['name' , 'email' , '_id' , 'driving']);
 };
 
 driverSchema.methods.generateAuthToken = function() {
     const driver = this;
     const access = 'auth';
     const token = jwt.sign({_id: driver._id.toHexString() , access} , "abc123").toString();
-    
+
     driver.driving = true;
     driver.tokens.push({
         access,
         token
     });
-    
+
     return driver.save().then(() => token);
 };
 
@@ -98,18 +87,18 @@ driverSchema.methods.verifyPassword = function(password) {
 
 driverSchema.methods.removeToken = function(token) {
     const driver = this;
-    
+
     if (driver.tokens.length === 1) {
         driver.driving = false;
         driver.save();
     }
-    
+
     return driver.update({
         $pull: {
             tokens: {token}
         }
     });
-}
+};
 
 driverSchema.statics.findByToken = function(token) {
     const Driver = this;
@@ -149,7 +138,7 @@ driverSchema.statics.findByCredentials = function(email , password) {
             });
         });
     });
-}
+};
 
 driverSchema.pre('save' , function(next) {
     const driver = this;
@@ -171,4 +160,4 @@ const Driver = mongoose.model('driver' , driverSchema);
 
 module.exports = {
     Driver
-}
+};

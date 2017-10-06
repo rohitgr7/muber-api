@@ -225,6 +225,21 @@ describe('DELETE /drivers/logout' , () => {
 
 });
 
+describe('GET /drivers/:location' , () => {
+   
+    it('should return the drivers nearby' , (done) => {
+        request(app)
+        .get('/drivers/trinagar')
+        .end((err , res) => {
+            expect(res.status).to.equal(200);
+            expect(res.body.length).to.equal(1);
+            expect(res.body[0].email).to.equal(drivers[0].email);
+            done();
+        });
+    });
+    
+});
+
 
 
 

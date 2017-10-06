@@ -11,6 +11,8 @@ var drivers = [{
     name: "Driver1",
     email: "driver1@example.com",
     password: 'driverone',
+    driving: true,
+    geometry: { type: 'Point' , coordinates: [77.1580929 , 28.6779655] },
     tokens: [{
         access: 'auth',
         token: jwt.sign({_id: idOne.toHexString() , access: 'auth'} , "abc123").toString()
@@ -19,7 +21,9 @@ var drivers = [{
     _id: idTwo,
     name: 'Driver2',
     email: 'driver2@example.com',
-    password: 'drivertwo'
+    password: 'drivertwo',
+    driving: false,
+    geometry: { type: 'Point' , coordinates: [-66.885417 , 71.5388001] }
 }];
 
 const populateDrivers = (done) => {
@@ -35,4 +39,4 @@ const populateDrivers = (done) => {
 module.exports = {
     drivers,
     populateDrivers
-}
+};

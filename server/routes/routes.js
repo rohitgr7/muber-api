@@ -8,4 +8,5 @@ module.exports = app => {
     app.delete('/drivers/me' , authenticate , DriverController.delete);
     app.post('/drivers/login' , DriverController.login);
     app.delete('/drivers/logout' , authenticate , DriverController.logout);
+    app.get('/drivers/:location' , DriverController.getDrivers);
 }

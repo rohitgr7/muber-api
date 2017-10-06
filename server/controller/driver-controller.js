@@ -2,6 +2,7 @@ const _ = require('lodash');
 const bcrypt = require('bcryptjs');
 
 const {Driver} = require('./../models/driver');
+const func = require('./../functions/function');
 
 module.exports = {
     create(req , res) {
@@ -81,5 +82,23 @@ module.exports = {
         }).catch((e) => {
             res.status(400).send();
         });
+    },
+
+    getDrivers(req , res) {
+        const address = req.params.location;
+        const encodedAddress = encodeURIComponent(address);
+
+        func.getLocation(encodedAddress).then(location => {
+            return Driver.geoNear(
+                { type: 'Point' , coordinates: [parseFloat(location.longitude) , parseFloat(location.latitude)] },
+                { spherical: true , maxDistance: 200000}
+            )
+                .then(drivers => {
+                drivers = func.driversToSend(drivers);
+                res.send(drivers);
+            });
+        }).catch(e => {
+            res.status(400).send();
+        });
     }
-}
+};
