@@ -4,7 +4,9 @@ const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const _ = require('lodash');
+
 const {pointSchema} = require('./pointSchema');
+const func = require('./../functions/function');
 
 const driverSchema = new Schema({
     name: {
@@ -59,7 +61,7 @@ driverSchema.methods.toJSON = function() {
 driverSchema.methods.generateAuthToken = function() {
     const driver = this;
     const access = 'auth';
-    const token = jwt.sign({_id: driver._id.toHexString() , access} , "abc123").toString();
+    const token = jwt.sign({_id: driver._id.toHexString() , access} , process.env.JWT_SECRET).toString();
 
     driver.driving = true;
     driver.tokens.push({
@@ -68,21 +70,6 @@ driverSchema.methods.generateAuthToken = function() {
     });
 
     return driver.save().then(() => token);
-};
-
-driverSchema.methods.verifyPassword = function(password) {
-    const driver = this;
-
-    return new Promise((resolve , reject) => {
-        bcrypt.compare(password , driver.password , (err , res) => {
-            if (err || !res) {
-                reject();
-            }
-            else {
-                resolve(driver);
-            }
-        });
-    });
 };
 
 driverSchema.methods.removeToken = function(token) {
@@ -105,7 +92,7 @@ driverSchema.statics.findByToken = function(token) {
     var decoded;
 
     try {
-        decoded = jwt.verify(token , 'abc123');
+        decoded = jwt.verify(token , process.env.JWT_SECRET);
     }
     catch(e) {
         return Promise.reject();
@@ -126,17 +113,8 @@ driverSchema.statics.findByCredentials = function(email , password) {
         if(!driver) {
             return Promise.reject();
         }
-
-        return new Promise((resolve , reject) => {
-            bcrypt.compare(password , driver.password , (err , res) => {
-                if (err || !res) {
-                    reject();
-                }
-                else {
-                    resolve(driver);
-                }
-            });
-        });
+        
+        return func.verifyPassword(driver , password);
     });
 };
 

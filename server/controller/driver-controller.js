@@ -34,7 +34,7 @@ module.exports = {
             body.password = bcrypt.hashSync(req.body.newPassword , 10);
         }
 
-        req.driver.verifyPassword(password)
+        func.verifyPassword(req.driver , password)
             .then(() => {
             if(req.body.newPassword) {
                 if (req.body.newPassword.length < 6) {

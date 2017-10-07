@@ -1,4 +1,5 @@
 const request = require('request');
+const bcrypt = require('bcryptjs');
 
 const getLocation = (address) => {
     return new Promise((resolve , reject) => {
@@ -31,7 +32,7 @@ const driversToSend = (drivers) => {
             arr.splice(index , 1);
         }
     });
-    
+
     drivers.forEach((curr , index , arr) => {
         arr[index] = {
             name: curr.obj.name,
@@ -40,11 +41,25 @@ const driversToSend = (drivers) => {
             _id: curr.obj._id
         }; 
     });
-    
+
     return drivers;
+};
+
+const verifyPassword = (driver , password) => {
+    return new Promise((resolve , reject) => {
+        bcrypt.compare(password , driver.password , (err , res) => {
+            if (err || !res) {
+                reject();
+            }
+            else {
+                resolve(driver);
+            }
+        });
+    });  
 };
 
 module.exports = {
     getLocation,
-    driversToSend
+    driversToSend,
+    verifyPassword
 }

@@ -15,7 +15,7 @@ var drivers = [{
     geometry: { type: 'Point' , coordinates: [77.1580929 , 28.6779655] },
     tokens: [{
         access: 'auth',
-        token: jwt.sign({_id: idOne.toHexString() , access: 'auth'} , "abc123").toString()
+        token: jwt.sign({_id: idOne.toHexString() , access: 'auth'} , process.env.JWT_SECRET).toString()
     }]
 } , {
     _id: idTwo,
